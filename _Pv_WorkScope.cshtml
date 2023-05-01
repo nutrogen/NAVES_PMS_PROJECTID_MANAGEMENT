@@ -1,0 +1,37 @@
+﻿@model List<VNAV_SELECT_PMS_WORK_SCOPE_LIST>
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.Notifications;
+
+<div class="align-items-center mx-0 mt-3 row bprder border-bottom bg-create-title">
+    <label class="col-sm-12 col-form-label text-center fw-bolder">Work Scope</label>
+</div>
+
+<div class="mx-0 bprder border-bottom mt-1">
+    <ejs-grid id="Grid" dataSource="@ViewBag.WorkScope" recordClick="recordClick" dataBound="dataBound"
+              allowResizing="true"
+              allowReordering="true"
+              allowMultiSorting="true"
+              allowSorting="true"
+              allowFiltering="true"
+              allowExcelExport="true"
+              allowPdfExport="true"
+              allowPaging="true"
+              showColumnChooser="true"
+              allowGrouping="true"
+              toolbar="@( new List<string>() { "ColumnChooser", "ExcelExport", "PdfExport", "CsvExport", "Print"})">
+        <e-grid-filterSettings type="CheckBox"></e-grid-filterSettings>
+        <e-grid-pagesettings pageCount="10" pageSize="10" pageSizes="@(new string[] {"10", "20" , "50", "All" })"></e-grid-pagesettings>
+        <e-grid-groupSettings enableLazyLoading="true" allowReordering="true" showDropArea="true"></e-grid-groupSettings>
+        <e-grid-columns>
+            <e-grid-column field="PROJECT_TITLE" headerText="Project Title" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="250"></e-grid-column>
+            <e-grid-column field="WORK_ID" headerText="Work Id" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="150"></e-grid-column>
+            <e-grid-column field="JOB_ID" headerText="Job ID" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="150"></e-grid-column>
+            <e-grid-column field="PROJECT_TYPE" headerText="Project Type" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="120"></e-grid-column>
+            <e-grid-column field="PROJECT_CATEGORY" headerText="Project Category" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="150"></e-grid-column>
+            <e-grid-column field="VESSEL_TYPE" headerText="Vessel Type" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="150"></e-grid-column>
+            <e-grid-column field="VESSEL_NAME" headerText="Vessel Name" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="250"></e-grid-column>
+            <e-grid-column field="DESCRIPTION" headerText="Subject" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="200"></e-grid-column>
+            <e-grid-column field="STATUS" headerText="Status" customAttributes=@(new{@class="customCss"}) textAlign="Center" width="100"></e-grid-column>
+        </e-grid-columns>
+    </ejs-grid>
+</div>

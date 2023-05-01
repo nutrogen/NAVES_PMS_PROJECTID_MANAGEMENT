@@ -1,0 +1,1008 @@
+﻿@using NavesPortalforWebWithCoreMvc.Common
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.Notifications;
+@using NavesPortalforWebWithCoreMvc.ViewModels;
+@inject IHttpContextAccessor httpContextaccessor
+@model NavesPortalforWebWithCoreMvc.ViewModels.ProjectViewModel;
+
+@{
+    ViewBag.PageTitle = "PMS > Porject ID Management";
+    ViewBag.PlatformName = "PMS";
+    ViewBag.MenuName = "Porject ID Management";
+    ViewBag.FunctionName = "Detail";
+}
+
+@section ContentsSection{
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="ps-2 pageContentTitle">
+            <h3>@ViewBag.MenuName</h3>
+        </div>
+        <div></div>
+    </div>
+
+    <div class="align-items-center mx-0 row bg-title">
+        <label class="col-sm-12 col-form-label text-center fw-bolder">Naval Business Planning Team</label>
+    </div>
+    <form id="frmPmsProjectIdManagement" fmethod="post" asp-action="Edit" asp-controller="PmsProjectIdManagement">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <div class="col-sm-4">
+                @{
+                    if (ViewBag.ProjectHistoryCount >= 1)
+                    {
+                        <h5 class="text-success">Modified Contract</h5>
+                    }
+                    else
+                    {
+                        <h5 class="text-primary">Original Contract</h5>
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Project ID</label>
+            <div class="col-sm-4">
+                <h4 class="my-0">
+                    @Model.PROJECT_ID
+                </h4>
+                <input type="text" readonly id="txtProjectId" asp-for="PROJECT_ID" Class="d-none" />
+                <input type="text" readonly id="txtProjectIDX" asp-for="PROJECT_IDX" Class="d-none" />
+            </div>
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Status</label>
+            <div class="col-sm-4">
+                <h4 class="my-0">
+                    @Model.STATUS
+                </h4>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Project Title</label>
+            <div class="col-sm-4">
+                <ejs-textbox type="text" id="txtProjectTitle" ejs-for="PROJECT_TITLE" cssClass="e-outline text-left inputable" placeholder="Project Title..."></ejs-textbox>
+            </div>
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Client Name</label>
+            <div class="col-sm-4">
+                <ejs-combobox id="comClientPlanning" ejs-for="CLIENT_NAME" dataSource="@CommonSettingData.GetClientNameList()" placeholder="Input or Select Client Name" cssClass="e-outline text-left inputable" popupHeight="230px" change="valueChangePlanning">
+                    <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+                </ejs-combobox>
+                <script>
+                    function valueChangePlanning() {
+                        var comClientPlanning = $("#comClientPlanning")[0].ej2_instances[0];
+                        var comClient = $("#comClient")[0].ej2_instances[0];
+                        comClient.value = comClientPlanning.value;
+                        $("#hdnTxtClientName").val(comClientPlanning.value.toString());
+                    }
+                </script>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row bprder border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Contract Date</label>
+            <div class="col-sm-4">
+                <ejs-datepicker id="dpContractDate" ejs-for="CONTRACT_DATE" format="yyyy-MM-dd" placeholder="Contract Date..." cssClass="inputable"></ejs-datepicker>
+            </div>
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Contract No.</label>
+            <div class="col-sm-4">
+                <ejs-textbox type="text" id="txtContractNo" ejs-for="CONTRACT_NO" cssClass="e-outline text-left inputable" placeholder="Contract No. ..."></ejs-textbox>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Term of Project</label>
+            <div class="col-sm-2">
+                <ejs-datepicker id="dpStartDate" ejs-for="TERM_OF_PROJECT_START_DATE" format="yyyy-MM-dd" placeholder="Commance Date..." cssClass="inputable"></ejs-datepicker>
+            </div>
+            <div class="col-sm-2">
+                <ejs-datepicker id="dpEndDate" ejs-for="TERM_OF_PROJECT_END_DATE" format="yyyy-MM-dd" placeholder="Complate Date..." cssClass="inputable"></ejs-datepicker>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Project Total Amount</label>
+            <div class="col-sm-2">
+                <ejs-dropdownlist id="dlCurrnecyType" ejs-for="CURRENCY_SYMPOL" dataSource="@ViewBag.CurrnecyType" cssClass="inputable text-end" placeholder="Currency Symbol...">
+                    <e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
+                </ejs-dropdownlist>
+            </div>
+            <div class="col-sm-2">
+                <ejs-numerictextbox id="txtProjectTotalAmount" min="0"
+                                ejs-for="PROJECT_TOTAL_AMOUNT"
+                                format="###,###,###,###"
+                                cssClass="e-outline text-end inputable"
+                                placeholder="Project Total Amount..."
+                                showSpinButton="false"
+                                textAlign="right"
+                                oninput="TotalConfirm()">
+                </ejs-numerictextbox>
+            </div>
+            <div class="col-sm-6">
+                <span id="spanTotalConfirm" class="text-danger d-none">총 금액과 Invoice 금액의 합에 차이가 있습니다.</span>
+            </div>
+        </div>
+
+        <div class="mx-0 row border-bottom g-0">
+            <div class="col-sm-2 col-form-label text-end fw-bolder bg-create-title row g-0 p-0">
+                <div class="col-5 border-end text-center pt-2">Invoice Plan</div>
+                <div class="col-7">
+                    <div class="row border-bottom g-0">
+                        <div class="col-9 py-2">
+                            initial
+                        </div>
+                        <div class="col-3 py-2 text-center">
+                            <ejs-checkbox id="chkInitial" ejs-for="INVOICE_IS_INITIAL" value="false" change="TotalConfirm"></ejs-checkbox>
+                        </div>
+                    </div>
+                    <div class="row border-bottom g-0">
+                        <div class="col-9 py-2">
+                            Intermediate
+                        </div>
+                        <div class="col-3 py-2 text-center">
+                            <ejs-checkbox id="chkIntermediate" ejs-for="INVOICE_IS_INTERMEDIATE" value="false" change="TotalConfirm"></ejs-checkbox>
+                        </div>
+                    </div>
+                    <div class="row g-0">
+                        <div class="col-9 py-2">
+                            Final
+                        </div>
+                        <div class="col-3 py-2 text-center">
+                            <ejs-checkbox id="chkFinal" ejs-for="INVOICE_IS_FINAL" value="false" change="TotalConfirm"></ejs-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2 px-2">
+                <div class="py-1">
+                    <ejs-datepicker id="dpInitialDate" format="yyyy-MM-dd" ejs-for="INVOICE_INITIAL_DATE" format="yyyy-MM-dd" placeholder="Initial Date..." cssClass="inputable"></ejs-datepicker>
+                </div>
+                <div class="py-1">
+                    <ejs-datepicker id="dpIntermediateDate" ejs-for="INVOICE_INTER_DATE" format="yyyy-MM-dd" placeholder="Intermediate Date..." cssClass="inputable"></ejs-datepicker>
+                </div>
+                <div class="py-1">
+                    <ejs-datepicker id="dpFinalDate" ejs-for="INVOICE_FINAL_DATE" format="yyyy-MM-dd" placeholder="Final Date..." cssClass="inputable"></ejs-datepicker>
+                </div>
+            </div>
+            <div class="col-sm-2 px-2">
+                <div class="py-1">
+                    <ejs-numerictextbox ejs-for="INVOICE_INITIAL_AMOUNT" id="txtInitialAmount"
+                                    min="0"
+                                    format="###,###,###,###"
+                                    cssClass="e-outline text-end inputable"
+                                    placeholder="Initial Amount..."
+                                    showSpinButton="false"
+                                    oninput="TotalConfirm()">
+                    </ejs-numerictextbox>
+                </div>
+                <div class="py-1">
+                    <ejs-numerictextbox id="txtIntermediateAmount" ejs-for="INVOICE_INTER_AMOUNT"
+                                    min="0"
+                                    format="###,###,###,###"
+                                    cssClass="e-outline text-end inputable"
+                                    placeholder="Intermediate Amount..."
+                                    showSpinButton="false"
+                                    oninput="TotalConfirm()">
+                    </ejs-numerictextbox>
+                </div>
+                <div class="py-1">
+                    <ejs-numerictextbox id="txtFinalAmount"
+                                    ejs-for="INVOICE_FINAL_AMOUNT"
+                                    min="0"
+                                    format="###,###,###,###"
+                                    cssClass="e-outline text-end inputable"
+                                    placeholder="Final Amount..."
+                                    showSpinButton="false"
+                                    oninput="TotalConfirm()">
+                    </ejs-numerictextbox>
+                </div>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Contract Quantity</label>
+            <div class="col-sm-4">
+                <ejs-numerictextbox id="txtQuantity" min="0" format="###,###,###" ejs-for="QUANTITY" cssClass="e-outline text-left inputable" placeholder="Quantity..."></ejs-numerictextbox>
+            </div>
+        </div>
+
+        <div class="mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Contract Document</label>
+            <div class="col-sm-10 py-1">
+                <div id="FileList">
+                    <partial name="~/Views/Uploader/_Pv_UploadedFileList.cshtml" model="@ViewBag.FileList" />
+                </div>
+                <div id="divContractDoc">
+                    @{
+                        var asyncSettingsContractDoc = new Syncfusion.EJ2.Inputs.UploaderAsyncSettings { SaveUrl = @Url.Content("~/PmsFileUpload/SaveUploadFilesContractDoc"), RemoveUrl = @Url.Content("~/PmsFileUpload/RemoveUploadFilesContractDoc") };
+                    }
+                    <ejs-uploader id="UploadFilesContractDoc" asyncSettings="@asyncSettingsContractDoc"
+                              maxFileSize="2147483648"
+                              autoUpload="false"
+                              multiple="true"
+                              selected="OnFileSelected"
+                              uploading="OnFileUploading"
+                              removing="OnFileRemoving"
+                              allowedExtensions="image/*, .pdf, .iso">
+                    </ejs-uploader>
+                    <script>
+                        function OnFileSelected(args) {
+                            for (var i = 0; i < args.filesData.length; i++) {
+                                args.filesData[i].name = "@ViewBag.CurrentIdx" + "__" + "@DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss")" + "__" + args.filesData[i].name;
+                            }
+                            args.isModified = true;
+                        }
+
+                        function OnFileUploading(args) {
+                            args.customFormData = [
+                                { 'PlatformName': 'PMS' },
+                                { 'CurrentDocIdx': "@ViewBag.CurrentIdx" },
+                                { 'Type': 'ContractDocument' },
+                                { 'ReleatedInfo': "@Model.RELEATED_IDX" },
+                                { 'OriginalFileName': args.fileData.id },
+                                { 'SavedFileName': args.fileData.name },
+                                { 'ProjectIdx': "@String.Empty" },
+                                { 'ProjectId': "@String.Empty" },
+                                { 'WorkIdx': "@String.Empty" },
+                                { 'WorkId': "@String.Empty" },
+                                { 'CreateUserName': '@httpContextaccessor.HttpContext.Session.GetString("UserName")' }
+                            ];
+                        }
+
+                        function OnFileRemoving(args) {
+                            args.customFormData = [
+                                { 'PlatformName': 'PMS' },
+                                { 'CurrentDocIdx': "@ViewBag.CurrentIdx" },
+                                { 'Type': 'ContractDocument' },
+                                { 'ReleatedInfo': "@Model.RELEATED_IDX" },
+                                { 'OriginalFileName': args.filesData[0].id },
+                                { 'SavedFileName': args.filesData[0].name },
+                                { 'ProjectIdx': "@String.Empty" },
+                                { 'ProjectId': "@String.Empty" },
+                                { 'WorkIdx': "@String.Empty" },
+                                { 'WorkId': "@String.Empty" },
+                                { 'CreateUserName': '@httpContextaccessor.HttpContext.Session.GetString("UserName")' }
+                            ];
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <div id="divModifyContractDoc" class="mx-0 row border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Modify Contract Doc.</label>
+            <div class="col-sm-10 py-1">
+                @{
+                    var asyncSettingsModifyContractDoc = new Syncfusion.EJ2.Inputs.UploaderAsyncSettings { SaveUrl = @Url.Content("~/PmsFileUpload/SaveUploadFilesModifyContractDoc"), RemoveUrl = @Url.Content("~/PmsFileUpload/RemoveUploadFilesModifyContractDoc") };
+                }
+                <ejs-uploader id="UploadFilesModifyContractDoc" asyncSettings="@asyncSettingsModifyContractDoc"
+                          maxFileSize="2147483648"
+                          autoUpload="false"
+                          multiple="true"
+                          uploading="OnModifyFileUploading"
+                          selected="OnFileSelected"
+                          removing="OnFileRemoving">
+                </ejs-uploader>
+                <input asp-for="RELEATED_IDX" value="@ViewBag.ReleatedIdx" class="d-none" />
+                <script>
+                    function OnModifyFileUploading(args) {
+                        args.customFormData = [
+                            { 'PlatformName': 'PMS' },
+                            { 'CurrentDocIdx': "@ViewBag.CurrentIdx" },
+                            { 'Type': 'ContractDocument' },
+                            { 'ReleatedInfo': "@ViewBag.ReleatedIdx" },
+                            { 'ReleatedBrforeInfo': "@Model.RELEATED_IDX" },
+                            { 'OriginalFileName': args.fileData.id },
+                            { 'SavedFileName': args.fileData.name },
+                            { 'ProjectIdx': "@String.Empty" },
+                            { 'ProjectId': "@String.Empty" },
+                            { 'WorkIdx': "@String.Empty" },
+                            { 'WorkId': "@String.Empty" },
+                            { 'CreateUserName': '@httpContextaccessor.HttpContext.Session.GetString("UserName")' }
+                        ];
+                    }
+                </script>
+            </div>
+        </div>
+
+        <div class="mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Modify Contract</label>
+            <div class="col-sm-10 py-1">
+                <ejs-checkbox id="chkModifyContract" label="Modfify Contract" ejs-for="IS_MODIFY_CONTRACT" change="OnChangeModifyContrct"></ejs-checkbox>
+                <span class="text-danger fs-6 ps-3">변경 계약서를 등록하시려면 선택하세요!!</span>
+            </div>
+            <script>
+                function OnChangeModifyContrct(args) {
+                    if (args.checked) {
+                        $("#divContractDoc").hide();
+                        $("#divModifyContractDoc").show();
+                    }
+                    else {
+                        $("#divContractDoc").show();
+                        $("#divModifyContractDoc").hide();
+                    }
+                }
+            </script>
+        </div>
+
+        @{
+            if (ViewBag.ProjectHistoryCount > 0)
+            {
+                <div class="align-items-center mx-0 mt-2">
+                    <h4>Project history</h4>
+                </div>
+                foreach (ContractHistoryViewModel project in ViewBag.ProjectHistoryList)
+                {
+                    <div class="mx-0 mt-1">
+                        <div class="d-grid">
+                            <div class="btn btn-secondary btn-sm d-flex justify-content-between" type="button" data-bs-toggle="collapse"
+                     data-bs-target="@string.Format($"#History_{project.PROJECT_HISTORY.IDX.ToString().Replace("-", "")}")"
+                     aria-expanded="false"
+                     aria-controls="@string.Format($"Collapse_{project.PROJECT_HISTORY.IDX.ToString().Replace("-", "")}")">
+                                <div>
+                                    @{
+                                        if (project.PROJECT_HISTORY.MODIFY_CONTRACT_COUNT == 0)
+                                        {
+                                            <span>Original Contract</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Modified Contract</span>
+                                        }
+                                    }
+
+                                    [ modified by @project.PROJECT_HISTORY.CREATE_USER_NAME at @project.PROJECT_HISTORY.REG_DATE ]
+                                </div>
+                                <div class="align-items-center">
+                                    <span class="e-icons e-chevron-down-double"></span>
+                                    <span class="e-icons e-chevron-up-double"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="collapse mt-1" id="@string.Format($"History_{project.PROJECT_HISTORY.IDX.ToString().Replace("-", "")}")">
+                            <div class="align-items-center mx-0 row  border-bottom border-top">
+                                <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Project Title</label>
+                                <div class="col-sm-4">
+                                    @project.PROJECT_HISTORY.PROJECT_TITLE
+                                </div>
+                            </div>
+
+                            <div class="align-items-center mx-0 row  border-bottom">
+                                <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Term of Project</label>
+                                <div class="col-sm-10">
+                                    @string.Format("{0:yyyy-MM-dd}", @project.PROJECT_HISTORY.TERM_OF_PROJECT_START_DATE) ~ @string.Format("{0:yyyy-MM-dd}", @project.PROJECT_HISTORY.TERM_OF_PROJECT_END_DATE)
+                                </div>
+                            </div>
+
+                            <div class="align-items-center mx-0 row  border-bottom">
+                                <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Project Total Amount</label>
+                                <div class="col-sm-4">
+                                    @project.PROJECT_HISTORY.CURRENCY_SYMBOL @project.PROJECT_HISTORY.PROJECT_TOTAL_AMOUNT?.ToString("N0")
+                                </div>
+                            </div>
+
+                            <div class="mx-0 row border-bottom g-0">
+                                <div class="col-sm-2 col-form-label text-end fw-bolder bg-create-title row g-0 p-0">
+                                    <div class="col-5 border-end text-center pt-2">Invoice Plan</div>
+                                    <div class="col-7">
+                                        <div class="row border-bottom g-0">
+                                            <div class="col-9 py-1">
+                                                initial
+                                            </div>
+                                            <div class="col-3 py-1 text-center">
+                                                @{
+                                                    if (project.PROJECT_HISTORY.INVOICE_IS_INITIAL.HasValue ? project.PROJECT_HISTORY.INVOICE_IS_INITIAL.Value : false)
+                                                    {
+                                                        <span class="e-icons e-check text-primary"></span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="row border-bottom g-0">
+                                            <div class="col-9 py-1">
+                                                Intermediate
+                                            </div>
+                                            <div class="col-3 py-1 text-center">
+                                                @{
+                                                    if (project.PROJECT_HISTORY.INVOICE_IS_INTERMEDIATE.HasValue ? project.PROJECT_HISTORY.INVOICE_IS_INTERMEDIATE.Value : false)
+                                                    {
+                                                        <span class="e-icons e-check text-primary"></span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="row g-0">
+                                            <div class="col-9 py-1">
+                                                Final
+                                            </div>
+                                            <div class="col-3 py-1 text-center">
+                                                @{
+                                                    if (project.PROJECT_HISTORY.INVOICE_IS_FINAL.HasValue ? project.PROJECT_HISTORY.INVOICE_IS_FINAL.Value : false)
+                                                    {
+                                                        <span class="e-icons e-check text-primary"></span>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 px-2 ps-0">
+                                    <div class="py-1 border-bottom">
+                                        @{
+                                            if (project.PROJECT_HISTORY.INVOICE_IS_INITIAL.HasValue ? project.PROJECT_HISTORY.INVOICE_IS_INITIAL.Value : false)
+                                            {
+                                                <span class="ps-2">
+                                                    @project.PROJECT_HISTORY.INVOICE_INITIAL_DATE?.ToString("yyyy-MM-dd")
+                                                </span>
+                                                <span class="ps-3">
+                                                    @project.PROJECT_HISTORY.CURRENCY_SYMBOL @project.PROJECT_HISTORY.INVOICE_INITIAL_AMOUNT?.ToString("N0")
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="ps-2">&nbsp;</span>
+                                            }
+                                        }
+                                    </div>
+                                    <div class="py-1 border-bottom ps-0">
+                                        @{
+                                            if (project.PROJECT_HISTORY.INVOICE_IS_INTERMEDIATE.HasValue ? project.PROJECT_HISTORY.INVOICE_IS_INTERMEDIATE.Value : false)
+                                            {
+                                                <span class="ps-2">
+                                                    @project.PROJECT_HISTORY.INVOICE_INTER_DATE?.ToString("yyyy-MM-dd")
+                                                </span>
+                                                <span class="ps-3">
+                                                    @project.PROJECT_HISTORY.CURRENCY_SYMBOL @project.PROJECT_HISTORY.INVOICE_INTER_AMOUNT?.ToString("N0")
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="ps-2">&nbsp;</span>
+                                            }
+
+                                        }
+                                    </div>
+                                    <div class="py-1">
+                                        @{
+                                            if (project.PROJECT_HISTORY.INVOICE_IS_FINAL.HasValue ? project.PROJECT_HISTORY.INVOICE_IS_FINAL.Value : false)
+                                            {
+                                                <span class="ps-2">
+                                                    @project.PROJECT_HISTORY.INVOICE_FINAL_DATE?.ToString("yyyy-MM-dd")
+                                                </span>
+                                                <span class="ps-3">
+                                                    @project.PROJECT_HISTORY.CURRENCY_SYMBOL @project.PROJECT_HISTORY.INVOICE_FINAL_AMOUNT?.ToString("N0")
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="ps-2">&nbsp;</span>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="align-items-center mx-0 row  border-bottom">
+                                <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Contract Quantity</label>
+                                <div class="col-sm-4">
+                                    @project.PROJECT_HISTORY.CONTRACT_QUANTITY
+                                </div>
+                            </div>
+
+                            <div class="mx-0 row  border-bottom">
+                                <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Modify User</label>
+                                <div class="col-sm-4 py-1">
+                                    @project.PROJECT_HISTORY.CREATE_USER_NAME
+                                </div>
+                                <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Modify Date</label>
+                                <div class="col-sm-4 py-1">
+                                    @project.PROJECT_HISTORY.REG_DATE
+                                </div>
+                            </div>
+
+                            <div class="mx-0 row  border-bottom">
+                                <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Contract Document</label>
+                                <div class="col-sm-10 py-1">
+                                    <!-- 수정전 계약서 -->
+                                    <partial name="~/Views/Uploader/_Pv_ContractHistoryUploadedFileList.cshtml" model="@project.FILES" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+
+        <div class="mt-3"></div>
+
+        <!-- Start Naval Vessel Survey Team -->
+        <div class="align-items-center mx-0 row bg-title">
+            <label class="col-sm-12 col-form-label text-center fw-bolder">Naval Business Center</label>
+        </div>
+
+        <div class="mx-0 row mt-1 border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Surveyor(PM)</label>
+            <div class="col-sm-4">
+                <ejs-autocomplete id="acPmUser" dataSource="@ViewBag.UserList" placeholder="Select PM..." autofill="true" filterType="Contains"
+                              cssClass="inputable"
+                              highlight="true"
+                              suggestionCount="20"
+                              minLength="3"
+                              popupHeight="400px"
+                              popupWidth="600px"
+                              headerTemplate="@Html.Raw("<div class=\"row m-2 p-1 fs-5 border-bottom border-2 bg-create-title\"><div class=\"col-4\">Dept.</div><div class=\"col-3\">User Name</div><div class=\"col-3\">SUR No.</div></div>")"
+                              itemTemplate="@Html.Raw("<div class=\"row border-bottom border-1\"><div class=\"col-4\">${DEPT_NAME}</div><div class=\"col-3\">${USER_NAME_E}</div><div class=\"col-3\">${SUR_NO}</div></div>")"
+                              change="OnChangeSelectPm">
+                    <e-autocomplete-fields value="USER_NAME_E"></e-autocomplete-fields>
+                </ejs-autocomplete>
+            </div>
+            <div id="pm" class="col-4 d-flex flex-wrap">
+                @{
+                    if (ViewBag.Pm != null)
+                    {
+                        foreach (TNAV_PROJECT_PIC pm in ViewBag.Pm)
+                        {
+                            string _PM = pm.SUR_NO != null ? pm.SUR_NO : "No Surveyor NO.";
+
+                            <div name="pm" class="list-group-item m-1 p-0 border-0 @pm.EMP_ID">
+                                <span class="fw-bold">@pm.USRE_NAME_EN&nbsp;&nbsp;&nbsp;</span>
+                                <span>[@_PM]&nbsp;&nbsp;&nbsp;</span>
+                                <span id="deleteIconPm" class="fe-delete delete-icon" onclick="OnClickDelete('@pm.EMP_ID', 'pm')"></span>
+                                <input type="text" class="d-none" name="PROJECT_PM" value="@pm.EMP_ID" />
+                            </div>
+                        }
+                    }
+                }
+            </div>
+            <div class="col-2 align-self-center">
+                <div class="d-flex justify-content-end">
+                    <input id="btnConfirm" class="btn btn-info btn-custom rounded-pill waves-effect waves-light" value="Confirm" onclick="OnClickConfirm('@Model.PROJECT_IDX')" />
+                    <input id="btnReject" class="btn btn-danger btn-custom rounded-pill waves-effect waves-light ms-1 me-0" value="Reject" onclick="OnClickReject('@Model.PROJECT_IDX')" />
+                </div>
+            </div>
+        </div>
+        <input type="text" asp-for="REJECT_USER_NAME" class="d-none" />
+        <input type="text" asp-for="REJECT_COMMENT" class="d-none" />
+        <input type="text" asp-for="REJECT_DATE" class="d-none" />
+        <input type="text" asp-for="CONFIRM_STATUS" class="d-none" />
+        <input type="text" asp-for="CONFIRM_DATE" class="d-none" />
+        <input type="text" asp-for="CONFIRM_USER_NAME" class="d-none" />
+
+        @{
+
+            if (Model.CONFIRM_STATUS == CommonSettingData.ProjectConfirmFromPM.REJECT.ToString())
+            {
+                <div class="align-items-center mx-0 row  border-bottom">
+                    <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Reject Comment</label>
+                    <div class="col-sm-10 p-1 bg-danger text-danger bg-opacity-10">
+                        <span class="ps-2 pe-2">@Model.CONFIRM_STATUS</span>
+                        <span class="pe-2">@Model.REJECT_COMMENT</span>
+                        <span>@Model.REJECT_DATE</span>
+                    </div>
+                </div>
+            }
+            if (Model.CONFIRM_STATUS == CommonSettingData.ProjectConfirmFromPM.CONFIRM.ToString())
+            {
+                <div class="align-items-center mx-0 row  border-bottom">
+                    <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Confirm Status</label>
+                    <div class="col-sm-10 p-1 bg-primary text-primary bg-opacity-10">
+                        <span class="ps-2 pe-2">@Model.CONFIRM_STATUS</span>
+                        <span class="pe-2">@Model.CONFIRM_DATE</span>
+                    </div>
+                </div>
+            }
+        }
+
+        <div class="mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Surveyor(Working Group)</label>
+            <div class="col-sm-4">
+                <ejs-autocomplete id="acPicUser" dataSource="@ViewBag.UserList" placeholder="Select PIC..." autofill="true" filterType="Contains"
+                              cssClass="inputable"
+                              highlight="true"
+                              suggestionCount="20"
+                              minLength="3"
+                              popupHeight="400px"
+                              popupWidth="600px"
+                              headerTemplate="@Html.Raw("<div class=\"row m-2 p-1 fs-5 border-bottom border-2 bg-create-title\"><div class=\"col-4\">Dept.</div><div class=\"col-3\">User Name</div><div class=\"col-3\">SUR No.</div></div>")"
+                              itemTemplate="@Html.Raw("<div class=\"row border-bottom border-1\"><div class=\"col-4\">${DEPT_NAME}</div><div class=\"col-3\">${USER_NAME_E}</div><div class=\"col-3\">${SUR_NO}</div></div>")"
+                              change="OnChangeSelectPic">
+                    <e-autocomplete-fields value="USER_NAME_E"></e-autocomplete-fields>
+                </ejs-autocomplete>
+            </div>
+
+            <div id="pic" class="col-6 d-flex flex-wrap">
+                @{
+                    if (ViewBag.Pic != null)
+                    {
+                        foreach (TNAV_PROJECT_PIC pic in ViewBag.Pic)
+                        {
+                            string _PIC = pic.SUR_NO != null ? pic.SUR_NO : "No Surveyor NO.";
+
+                            <div name="pic" class="list-group-item m-1 p-0 border-0 @pic.EMP_ID">
+                                <span class="fw-bold">@pic.USRE_NAME_EN&nbsp;&nbsp;&nbsp;</span>
+                                <span>[@_PIC]&nbsp;&nbsp;&nbsp;</span>
+                                <span id="deleteIconPic" class="fe-delete delete-icon" onclick="OnClickDelete('@pic.EMP_ID', 'pic')"></span>
+                                <input type="text" class="d-none" name="PROJECT_PIC" value="@pic.EMP_ID" />
+                            </div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Work ID Quantity</label>
+            <div class="col-sm-4">
+                <ejs-numerictextbox id="txtWorkIdQuantity" min="0" format="###,###,###" ejs-for="WORK_ID_QUANTITY" cssClass="e-outline text-left inputable" placeholder="Work ID Quantity..."></ejs-numerictextbox>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Project Type</label>
+            <div class="col-sm-4">
+                <ejs-dropdownlist id="dlProjectType" ejs-for="PROJECT_TYPE" dataSource="@ViewBag.ProjectType" placeholder="Select Prject Type..." popupHeight="220px" cssClass="inputable">
+                    <e-dropdownlist-fields text="Text" value="Value"></e-dropdownlist-fields>
+                </ejs-dropdownlist>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Client Name</label>
+            <div class="col-sm-4">
+                <input id="hdnTxtClientName" type="text" asp-for="CLIENT_NAME" class="d-none" />
+                <ejs-combobox id="comClient" ejs-for="CLIENT_NAME" dataSource="@CommonSettingData.GetClientNameList()" placeholder="Input or Select Client Name" cssClass="e-outline text-left inputable" popupHeight="230px" change="valueChange">
+                    <e-combobox-fields text="Text" value="Value"></e-combobox-fields>
+                </ejs-combobox>
+                <script>
+                    function valueChange() {
+                        var comClient = $("#comClient")[0].ej2_instances[0];
+                        var comClientPlanning = $("#comClientPlanning")[0].ej2_instances[0];
+                        comClientPlanning.value = comClient.value;
+                        $("#hdnTxtClientName").val(comClientPlanning.value.toString());
+                    }
+                </script>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Clients Contractor</label>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-4">
+                        <ejs-textbox type="text" id="txtContractorName" ejs-for="CLIENT_CONTRACTOR_NAME" cssClass="e-outline text-left inputable" placeholder="Contractor Name..."></ejs-textbox>
+                    </div>
+                    <div class="col-4">
+                        <ejs-textbox type="text" id="txtContractorMobile" ejs-for="CLIENT_CONTRACTOR_MOBILE" cssClass="e-outline text-left inputable" placeholder="Contractor Phone..."></ejs-textbox>
+                    </div>
+                    <div class="col-4">
+                        <ejs-textbox type="text" id="txtContractorEmail" ejs-for="CLIENT_CONTRACTOR_EMAIL" cssClass="e-outline text-left inputable" placeholder="Contractor Email..."></ejs-textbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Clients Supervisor</label>
+            <div class="col-sm-6">
+                <div class="row">
+                    <div class="col-4">
+                        <ejs-textbox type="text" id="txtSupervisorName" ejs-for="CLIENT_SUPERVISOR_NAME" cssClass="e-outline text-left inputable" placeholder="Supervisor Name..."></ejs-textbox>
+                    </div>
+                    <div class="col-4">
+                        <ejs-textbox type="text" id="txtSupervisorPhone" ejs-for="CLIENT_SUPERVISOR_MOBILE" cssClass="e-outline text-left inputable" placeholder="Supervisor Phone..."></ejs-textbox>
+                    </div>
+                    <div class="col-4">
+                        <ejs-textbox type="text" id="txtSupervisorEmail" ejs-for="CLIENT_SUPERVISOR_EMAIL" cssClass="e-outline text-left inputable" placeholder="Supervisor Email..."></ejs-textbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="align-items-center mx-0 row  border-bottom">
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Create User</label>
+            <div class="col-sm-4">
+                @Model.CREATE_USER_NAME
+            </div>
+            <label class="col-sm-2 col-form-label text-end fw-bolder bg-create-title">Create Date</label>
+            <div class="col-sm-4">
+                @Model.REG_DATE.ToShortDateString() @Model.REG_DATE.ToShortTimeString()
+            </div>
+        </div>
+    </form>
+    <div class="pt-2 mx-0">
+        <div class="float-start row g-0">
+            <div class="col-auto pe-2">
+                <a id="btnCreateWorkIDPupup" class="btn btn-success rounded-pill waves-effect waves-light btn-medium" style="width:140px;" onclick="CreateWorkIDPupup()">Create WorkID</a>
+            </div>
+            <div class="col-auto pe-2">
+                <a id="btnShowLog" class="btn btn-success btn-medium rounded-pill waves-effect waves-light" style="width:120px;">Show Log</a>
+            </div>
+            <div class="col-auto">
+            </div>
+        </div>
+        <div class="float-end row g-0">
+            <div class="col-auto pe-2">
+            </div>
+            <div class="col-auto pe-2">
+                <input type="submit" form="frmPmsProjectIdManagement" id="btnSave" class="btn btn-primary  rounded-pill waves-effect waves-light btn-medium" value="SAVE" />
+            </div>
+            <div class="col-auto">
+                <a asp-controller="PmsProjectIdManagement" asp-action="Index" id="btnList" class="btn btn-primary rounded-pill waves-effect waves-light btn-medium">LIST</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <partial name="_Pv_WorkScope" model="@ViewBag.WorkScope" />
+    <partial name="~/Views/Common/_PvAlertModal.cshtml" model="ViewBag.Msg" />
+
+    <script>
+        // PM 선택
+        function OnChangeSelectPm(args) {
+            var acPmUser = document.getElementById('acPmUser').ej2_instances[0];
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SelectUser")",
+                data: { "USER_NAME_E": args.value },
+                success: function (response) {
+                    if (response != null && response.SUR_NO != null) {
+                        $("#pm").append("<div name=\"pm\" class=\"list-group-item m-1 p-0 border-0 " + response.EMP_ID +
+                            "\"><span class=\"fw-bold\">" + response.USER_NAME_E +
+                            "&nbsp;&nbsp;&nbsp;</span><span>[" + response.SUR_NO +
+                            "]&nbsp;&nbsp;&nbsp;</span><span class=\"fe-delete delete-icon\" onclick=\"OnClickDelete('" + response.EMP_ID +
+                            "', 'pm')\"></span><input type=\"text\" class=\"d-none\" name=\"PROJECT_PM\" value=\"" + response.EMP_ID + "\"\/></div> ");
+                    } else {
+                        $("#pm").append("<div name=\"pm\" class=\"list-group-item m-1 p-0 border-0 " + response.EMP_ID +
+                            "\"><span class=\"fw-bold\">" + response.USER_NAME_E +
+                            "&nbsp;&nbsp;&nbsp;</span><span>[No surveyor NO.]&nbsp;&nbsp;&nbsp;</span><span class=\"fe-delete delete-icon\" onclick=\"OnClickDelete('" + response.EMP_ID +
+                            "', 'pm')\"></span><input type=\"text\" class=\"d-none\" name=\"PROJECT_PM\" value=\"" + response.EMP_ID + "\"\/></div> ");
+                    }
+                    acPmUser.value = null;
+                },
+                error: function (req, status, error) {
+                }
+            });
+        }
+
+        // PIC 선택
+        function OnChangeSelectPic(args) {
+            var acPicUser = document.getElementById('acPicUser').ej2_instances[0];
+            if (args.value.length >= 2) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("SelectUser")",
+                    data: { "USER_NAME_E": args.value },
+                    success: function (response) {
+                        if (response != null && response.SUR_NO != null) {
+                            $("#pic").append("<div name=\"pic\" class=\"list-group-item m-1 p-0 border-0 " + response.EMP_ID +
+                                "\"><span class=\"fw-bold\">" + response.USER_NAME_E +
+                                "&nbsp;&nbsp;&nbsp;</span><span>[" + response.SUR_NO +
+                                "]&nbsp;&nbsp;&nbsp;</span><span class=\"fe-delete delete-icon\" onclick=\"OnClickDelete('" + response.EMP_ID +
+                                "', 'pic')\"></span><input type=\"text\" class=\"d-none\" name=\"PROJECT_PIC\" value=\"" + response.EMP_ID + "\"\/></div>");
+                        } else {
+                            $("#pic").append("<div name=\"pic\" class=\"list-group-item m-1 p-0 border-0 " + response.EMP_ID +
+                                "\"><span class=\"fw-bold\">" + response.USER_NAME_E +
+                                "&nbsp;&nbsp;&nbsp;</span><span>[No surveyor NO.]&nbsp;&nbsp;&nbsp;</span><span class=\"fe-delete delete-icon\" onclick=\"OnClickDelete('" + response.EMP_ID +
+                                "', 'pic')\"></span><input type=\"text\" class=\"d-none\" name=\"PROJECT_PIC\" value=\"" + response.EMP_ID + "\"\/></div>");
+                        }
+                        acPicUser.value = null;
+                    },
+                    error: function (req, status, error) {
+                    }
+                });
+            }
+        }
+
+        // PM, PIC 삭제
+        function OnClickDelete(args, user) {
+            $("#" + user + " > ." + args).remove();
+        }
+
+        // 프로젝트 승인
+        function OnClickConfirm(ProjectIdx) {
+            if (confirm("Are you sure you want to approve?")) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ConfrimProject")",
+                    data: { "Project_Idx": "@Model.PROJECT_IDX" },
+                    dataType: "json",
+                    success: function (data) {
+                        if ("OK" == data) {
+                            alert("Approved: " + "@Html.Raw(Model.PROJECT_TITLE)");
+                        }
+                        else {
+                            alert("Failed to save");
+                        }
+                        window.location.href = "@Url.Action("Detail", new{id = Model.PROJECT_IDX})";
+                    },
+                    error: function (xhr, status, error) {
+                        alert("Error");
+                    }
+                });
+            }
+        }
+
+        // 프로젝트 리젝트
+        function OnClickReject(ProjectIdx) {
+            if (confirm("Would you like to decline the approval?")) {
+                var comment = prompt("Enter reason for decline!!", '');
+                if (comment === "") {
+                    OnClickReject(ProjectIdx);
+                } else {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("RejectProject")",
+                        data: { "Project_Idx": "@Model.PROJECT_IDX", "Comment": comment },
+                        dataType: "json",
+                        success: function (data) {
+                            if ("OK" === data) {
+                                alert("Decline: " + "@Html.Raw(Model.PROJECT_TITLE)");
+                            }
+                            else {
+                                alert("Failed to save");
+                            }
+                            window.location.href = "@Url.Action("Detail", new{id = Model.PROJECT_IDX})";
+                        },
+                        error: function (xhr, status, error) {
+                            alert("Error");
+                        }
+                    });
+
+                }
+            }
+        }
+
+        // Work ID 생성
+        function CreateWorkIDPupup() {
+            var W = (screen.availWidth * 0.7);
+            var H = 790;
+
+            var popupX = (screen.availWidth / 2) - (W / 2);
+            var popupY = (screen.availHeight / 2) - (H / 2);
+
+            var opt = "status=no,width=" + W + "px, height=" + H + "px, left=" + popupX + ", top=" + popupY + ",scrollbars=yes";
+            var popup = window.open('@Url.Action("WorkIdCreatePopUp", "PmsWorkIdManagement",new {projectIDX = Model.PROJECT_IDX})', 'WorkId Create', opt);
+
+            popup.opener = window;
+            popup.focus();
+        }
+
+        // Work ID 상세 팝업
+        function recordClick(args) {
+            var W = (screen.availWidth * 0.7);
+            var H = 790;
+
+            var popupX = (screen.availWidth / 2) - (W / 2);
+            var popupY = (screen.availHeight / 2) - (H / 2);
+
+            var opt = "status=no,width=" + W + "px, height=" + H + "px, left=" + popupX + ", top=" + popupY + ",scrollbars=yes";
+            var url = "/PmsWorkIdManagement/WorkIdDetailPopUp/?WorkIdx=" + args.rowData.WORK_IDX;
+            var popup = window.open(url, 'WorkId Detail', opt);
+
+            popup.opener = window;
+            popup.focus();
+        }
+
+        // 스크롤바 삭제
+        function dataBound() {
+            var grid = $('#Grid')[0].ej2_instances[0];
+            grid.hideScroll();
+        }
+
+        // Invoice 금액 합계 검증
+        function TotalConfirm() {
+            var result = true;
+            var Sum = 0;
+            var Total = 0
+            if ($("#txtProjectTotalAmount").val() != "") {
+                Total = parseInt($("#txtProjectTotalAmount").val().replace(/,/g, ""));
+            }
+
+            if ($("#chkInitial").is(":checked")) {
+                if ($("#txtInitialAmount").val() != "") {
+                    Sum += parseInt($("#txtInitialAmount").val().replace(/,/g, ""));
+                }
+            } else {
+                $("#txtInitialAmount").val("");
+            }
+
+
+            if ($("#chkIntermediate").is(":checked")) {
+                if ($("#txtIntermediateAmount").val() != "") {
+                    Sum += parseInt($("#txtIntermediateAmount").val().replace(/,/g, ""));
+                }
+            } else {
+                $("#txtIntermediateAmount").val("");
+            }
+
+            if ($("#chkFinal").is(":checked")) {
+                if ($("#txtFinalAmount").val() != "") {
+                    Sum += parseInt($("#txtFinalAmount").val().replace(/,/g, ""));
+                }
+            } else {
+                $("#txtFinalAmount").val("");
+            }
+
+            if (Sum != Total) {
+                result = false;
+            }
+
+            if (result) {
+                // 같음.
+                $("#spanTotalConfirm").addClass("d-none");
+            }
+            else {
+                // 다름.
+                if ($("#spanTotalConfirm").hasClass("d-none")) {
+                    $("#spanTotalConfirm").removeClass("d-none");
+                }
+            }
+
+        }
+    </script>
+}
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            //PM confirm 버튼 숨김
+            if ("@Model.CONFIRM_STATUS" == "@CommonSettingData.ProjectConfirmFromPM.CONFIRM.ToString()") {
+                $("#btnConfirm").addClass("d-none");
+                $("#btnReject").addClass("d-none");
+            }
+
+            // show Contract Doc. Uploader
+            $("#divContractDoc").show();
+
+            // hide Modify Contract Doc. Uploader
+            $("#divModifyContractDoc").hide();
+
+            // 프로젝트의 상태값 확인
+            //if ("@Model.STATUS" == "@CommonSettingData.ProjectID_Status.SUBMIT.ToString()") {
+            //    if ($("#btnConfirm").hasClass("d-none")) {
+            //        $("#btnConfirm").removeClass("d-none");
+            //    }
+
+            //    if ($("#btnReject").hasClass("d-none")) {
+            //        $("#btnReject").removeClass("d-none");
+            //    }
+            //} else {
+            //    if (!$("#btnConfirm").hasClass("d-none")) {
+            //        $("#btnConfirm").addClass("d-none");
+            //    }
+            //    if (!$("#btnReject").hasClass("d-none")) {
+            //        $("#btnReject").addClass("d-none");
+            //    }
+            //}
+        });
+
+        // Show Log Button
+        $("#btnShowLog").click(function () {
+            var W = (screen.availWidth * 0.5);
+            var H = 750;
+
+            var popupX = (screen.availWidth / 2) - (W / 2);
+            var popupY = (screen.availHeight / 2) - (H / 2);
+
+            var opt = "status=no,width=" + W + "px, height=" + H + "px, left=" + popupX + ", top=" + popupY + ",scrollbars=yes";
+            var popup = window.open('@Url.Action("ShowLog", "Common", new{id = Model.PROJECT_IDX, platform = "PMS"})', 'LogList', opt);
+
+            popup.opener = window;
+            popup.focus();
+        });
+
+        // File Upload
+        $("#btnSave").click(function () {
+            if ($("#chkModifyContract")[0].checked) {
+                // Modify Contract Doc.
+                var uploadModifyContractDocObj = $("#UploadFilesModifyContractDoc")[0].ej2_instances[0];
+                uploadModifyContractDocObj.upload(uploadModifyContractDocObj.getFilesData());
+            }
+            else {
+                // Contract Doc.
+                var uploadContractObj = $("#UploadFilesContractDoc")[0].ej2_instances[0];
+                uploadContractObj.upload(uploadContractObj.getFilesData());
+            }
+        });
+    </script>
+}
